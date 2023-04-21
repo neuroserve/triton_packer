@@ -1,0 +1,12 @@
+--- multi_copy.c.orig   2023-04-20 16:05:18.094157936 +0000
++++ multi_copy.c        2023-04-20 16:06:09.289781699 +0000
+@@ -52,6 +52,8 @@
+ #include <netinet/in.h> /* for htons */
+ #include <string.h>
+ 
++#include "sys/stat.h" /* illumos */
++
+ #include "distributed/pg_version_constants.h"
+ 
+ #include "access/htup_details.h"
+

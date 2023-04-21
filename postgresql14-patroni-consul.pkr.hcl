@@ -30,8 +30,8 @@ packer {
   }
 }
 
-source "triton" "postgresql12-patroni-consul" {
-  image_name    = "postgresql12-patroni-consul"
+source "triton" "postgresql14-patroni-consul" {
+  image_name    = "postgresql14-patroni-consul"
   image_version = "${var.image_version}"
   source_machine_image_filter {
     most_recent = "true"
@@ -48,7 +48,7 @@ source "triton" "postgresql12-patroni-consul" {
 }
 
 build {
-  sources = ["source.triton.postgresql12-patroni-consul"]
+  sources = ["source.triton.postgresql14-patroni-consul"]
 
   provisioner "file" {
     source = "${path.root}/smf_manifests/consul.xml"
@@ -69,7 +69,7 @@ build {
   provisioner "shell" {
     inline = [
       "pkgin -y update",
-      "pkgin -y install postgresql12-server",
+      "pkgin -y install postgresql14-server",
 
       # Install (but don't enable") consul.  
       "mkdir -p /opt/local/etc/consul.d/certificates",
@@ -97,11 +97,12 @@ build {
 
 
       # Psycopg2
-      # "pkgin -y install py38-psycopg2",
+      "pkgin -y install py310-psycopg2-2.8.6nb1",
+      "pkgin -y install py310-expat-3.10.9nb1",
 
       # PIP
-      "python3.8 -m ensurepip --upgrade",
-      "python3.8 -m pip install --upgrade pip",
+      "python3.10 -m ensurepip --upgrade",
+      "python3.10 -m pip install --upgrade pip",
 
       # Patroni
       "pip3 install patroni[consul]",
@@ -113,24 +114,24 @@ build {
       # This is done because the packaged version builds with Kerberos support which
       # core dumps when running under Patroni.
       "pkgin -y install gmake",
-      "wget https://ftp.postgresql.org/pub/source/v12.8/postgresql-12.8.tar.bz2 -O /tmp/postgresql-12.8.tar.bz2",
-      "tar xjvf /tmp/postgresql-12.8.tar.bz2 -C /root",
+      "wget https://ftp.postgresql.org/pub/source/v14.6/postgresql-14.6.tar.bz2 -O /tmp/postgresql-14.6.tar.bz2",
+      "tar xjvf /tmp/postgresql-14.6.tar.bz2 -C /root",
       "mkdir -p /tmp/pgsql",
-      "cd /tmp/pgsql ; /root/postgresql-12.8/configure --prefix=/opt/local/",
+      "cd /tmp/pgsql ; /root/postgresql-14.6/configure --prefix=/opt/local/",
       "gmake -C /tmp/pgsql install",
 
-      "rm -rf /root/postgresql-12.8",
+      "rm -rf /root/postgresql-14.6",
 
       # Install the patroni service xml
       "svccfg import /opt/patroni.xml",
 
       # Build and install citus extension
-      "wget https://github.com/citusdata/citus/archive/refs/tags/v11.2.0.tar.gz -o /tmp/citus-11.2.0.tar.gz",
-      "tar xjvf /tmp/citus-11.2.0.tar.gz -C /root",
+      "wget https://github.com/citusdata/citus/archive/refs/tags/v11.2.0.tar.gz -O /tmp/citus-11.2.0.tar.gz",
+      "tar xvzf /tmp/citus-11.2.0.tar.gz -C /root",
       "mkdir -p /tmp/citus",
       "cd /tmp/citus ; /root/citus-11.2.0/configure --prefix=/opt/local",
       # patch 
-      "patch /root/citus-11.2.0/src/backend/distributed/commands/multi_copy.c <<< /var/tmp/citus.patch",
+      "patch /root/citus-11.2.0/src/backend/distributed/commands/multi_copy.c < /var/tmp/citus.patch",
 
       "gmake -C /tmp/citus install",
       "rm -rf /root/citus-11.2.0",
