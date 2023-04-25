@@ -23,7 +23,7 @@
             <method_credential user="consul" group="consul"/>
         </method_context>
 
-        <exec_method type="method" name="start" exec="/opt/local/bin/consul agent -config-dir %{config_dir}" timeout_seconds="60"/>
+	<exec_method type="method" name="start" exec="/opt/local/bin/consul agent -config-dir=%{config_dir} -data-dir=/opt/local/consul -datacenter de-gt-2 -retry-join consul.svc.a5ba23f5-8237-6879-e7e1-ea6f574fbde9.de-gt-2.snc.tgos.xyz -retry-interval 10s -rejoin" timeout_seconds="60"/>
 
         <exec_method type="method" name="stop" exec=":kill" timeout_seconds="60"/>
         <exec_method type="method" name="refresh" exec=":kill -HUP" timeout_seconds="10"/>
