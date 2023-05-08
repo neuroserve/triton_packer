@@ -126,15 +126,15 @@ build {
       "svccfg import /opt/patroni.xml",
 
       # Build and install citus extension
-      "wget https://github.com/citusdata/citus/archive/refs/tags/v11.2.0.tar.gz -O /tmp/citus-11.2.0.tar.gz",
-      "tar xvzf /tmp/citus-11.2.0.tar.gz -C /root",
+      "wget https://github.com/citusdata/citus/archive/refs/tags/v11.3.0.tar.gz -O /tmp/citus-11.3.0.tar.gz",
+      "tar xvzf /tmp/citus-11.3.0.tar.gz -C /root",
       "mkdir -p /tmp/citus",
-      "cd /tmp/citus ; /root/citus-11.2.0/configure --prefix=/opt/local",
+      "cd /tmp/citus ; /root/citus-11.3.0/configure --prefix=/opt/local",
       # patch 
-      "patch /root/citus-11.2.0/src/backend/distributed/commands/multi_copy.c < /var/tmp/citus.patch",
+      "patch /root/citus-11.3.0/src/backend/distributed/commands/multi_copy.c < /var/tmp/citus.patch",
 
       "gmake -C /tmp/citus install",
-      "rm -rf /root/citus-11.2.0",
+      "rm -rf /root/citus-11.3.0",
 
       # Build and install pgbackrest
       "pkgin -y install git",
